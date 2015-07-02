@@ -83,6 +83,11 @@
                 game.load.image('button-symbol-squ', 'img/butt-sym-squ.png');
                 game.load.image('button-symbol-tri', 'img/butt-sym-tri.png');
 
+                //empty buttons
+                game.load.image('button-empty', 'img/grey.png');
+                // bg
+                game.load.image('bg-image', 'img/paper.jpg');
+
                 // FX
                 game.load.audio('errorSnd', 'snd/error.ogg');
 
@@ -94,7 +99,21 @@
 //                console.log(game.scale.scaleMode);
             }
 
+            function setSecret(secret) {
+                secret.soundSprite = game.add.audio(secret.sound);
+                secret.soundSprite.onStop.add(soundStopped, this);
+                secret.imageSprite = game.add.sprite(0, 0, secret.image);
+                secret.imageSprite.visible = false;
+                secret.imageSprite.inputEnabled = true;
+                secret.imageSprite.events.onInputUp.add(hide, secret.imageSprite);
+            }
+            
             function create() {
+                // setting bg and empty buttons:
+                game.add.image(0, 0, 'bg-image');
+                game.add.image(50, 50, 'button-empty');
+                game.add.image(50 + 300 + 40, 50, 'button-empty');
+                game.add.image(50 + 600 + 80, 50, 'button-empty');
                 buttonsGroup = game.add.group();
                 var tx = 50;
                 var ty = 350;
@@ -112,13 +131,7 @@
 
                 // secrets:
                 comboToResult['squtripi'] = {image: "secret1_img", sound: "secret1_snd"};
-                comboToResult['squtripi'].soundSprite = game.add.audio(comboToResult['squtripi'].sound);
-                comboToResult['squtripi'].soundSprite.onStop.add(soundStopped, this);
-                comboToResult['squtripi'].imageSprite = game.add.sprite(0, 0, comboToResult['squtripi'].image);
-                comboToResult['squtripi'].imageSprite.visible = false;
-                comboToResult['squtripi'].imageSprite.inputEnabled = true;
-                comboToResult['squtripi'].imageSprite.events.onInputUp.add(hide, comboToResult['squtripi'].imageSprite);
-
+                setSecret(comboToResult['squtripi']);
                 comboToResult['eyespisna'] = {image: "secret2_img", sound: "secret2_snd"};
                 // ...
 
