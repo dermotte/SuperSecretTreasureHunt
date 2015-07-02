@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">-->
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <!--<link rel="stylesheet" type="text/css" href="css/index.css">-->
+        <style type="text/css">
+            body {
+                margin: 0;
+                background-color: #E4E4E4;
+            }
+        </style>
+        <title>SuperSecret</title>
+    </head>
+    <body>
+        <div class="app" id="gameElement">
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/phaser.js"></script>
+        <script type="text/javascript">
+            var game = new Phaser.Game(1080, 1920, Phaser.AUTO, 'gameElement', {
+                preload: preload,
+                create: create,
+                update: update
+            });
+            var buttonsGroup;
+            var eye, jum, mou, pi, run, sna, spi, squ, tri;
+            var errorSnd;
+
+            var count = 0;
+            var nextX = 50, nextY = 50;
+
+            var currentCombo = '';
+
+            var soundPlaying = false;
+
+            var selectedSymbols = new Array();
+
+
+            // put the secrets here:
+            var comboToResult = new Array();
+
+
+            function preload() {
+                game.stage.setBackgroundColor(0xE4E4E4);
+                // load symbol buttons:
+                game.load.image('button-symbol-eye', 'img/butt-sym-eye.png');
+                game.load.image('button-symbol-jum', 'img/butt-sym-jum.png');
+                game.load.image('button-symbol-mou', 'img/butt-sym-mou.png');
+                game.load.image('button-symbol-pi', 'img/butt-sym-pi.png');
+                game.load.image('button-symbol-run', 'img/butt-sym-run.png');
+                game.load.image('button-symbol-sna', 'img/butt-sym-sna.png');
+                game.load.image('button-symbol-spi', 'img/butt-sym-spi.png');
+                game.load.image('button-symbol-squ', 'img/butt-sym-squ.png');
+                game.load.image('button-symbol-tri', 'img/butt-sym-tri.png');
+
+                // FX
+                game.load.audio('errorSnd', 'snd/error.ogg');
+
+                // load secrets:
+                game.load.image('secret1_img', 'img/secret1.jpg');
+                game.load.audio('secret1_snd', 'snd/secret1.ogg');
+                game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+                game.scale.forceOrientation(false, true);
+//                console.log(game.scale.scaleMode);
+            }
+
+            function create() {
+                buttonsGroup = game.add.group();
+                var tx = 50;
+                var ty = 350;
+                eye = getSprite(tx,                 1920 - ty - 300, 'button-symbol-eye');
+                jum = getSprite(tx + 300 + 40,      1920 - ty - 300, 'button-symbol-jum');
+                mou = getSprite(tx + 2*300 + 2*40,  1920 - ty - 300, 'button-symbol-mou');
+                pi  = getSprite(tx,                 1920 - ty - 2*300 - 40, 'button-symbol-pi');
+                run = getSprite(tx + 300 + 40,      1920 - ty - 2*300 - 40, 'button-symbol-run');
+                sna = getSprite(tx + 2*300 + 2*40,  1920 - ty - 2*300 - 40, 'button-symbol-sna');
+                spi = getSprite(tx,                 1920 - ty - 3*300 - 2*40, 'button-symbol-spi');
+                squ = getSprite(tx + 300 + 40,      1920 - ty - 3*300 - 2*40, 'button-symbol-squ');
+                tri = getSprite(tx + 2*300 + 2*40,  1920 - ty - 3*300 - 2*40, 'button-symbol-tri');
+
+                errorSnd = game.add.audio('errorSnd');
+
+                // secrets:
+                comboToResult['squtripi'] = {image: "secret1_img", sound: "secret1_snd"};
+                comboToResult['squtripi'].soundSprite = game.add.audio(comboToResult['squtripi'].sound);
+                comboToResult['squtripi'].soundSprite.onStop.add(soundStopped, this);
+                comboToResult['squtripi'].imageSprite = game.add.sprite(0, 0, comboToResult['squtripi'].image);
+                comboToResult['squtripi'].imageSprite.visible = false;
+                comboToResult['squtripi'].imageSprite.inputEnabled = true;
+                comboToResult['squtripi'].imageSprite.events.onInputUp.add(hide, comboToResult['squtripi'].imageSprite);
+
+                comboToResult['eyespisna'] = {image: "secret2_img", sound: "secret2_snd"};
+                // ...
+
+//                game.add.sprite(50, 1920-50-300, 'button-symbol-eye');
+//                eye.width = 300;
+//                eye.height = 300;
+
+            }
+
+            function update() {
+//                running += 0.05;
+//                star.x = 300 + Math.cos(running)*120;
+//                star.y = 400 + Math.sin(running)*150;
+            }
+
+            function getSprite(x, y, mySprite) {
+                var result = buttonsGroup.create(x, y, mySprite);
+                result.width = 300;
+                result.height = 300;
+                result.inputEnabled = true;1
+                result.events.onInputUp.add(clickButton);
+                return result;
+            }
+
+            function hide(sprite) {
+                console.log(soundPlaying)
+                if (!soundPlaying) {
+                    sprite.visible = false;
+                    resetButtons();
+                }
+            }
+
+            function soundStopped() {
+                soundPlaying = false;
+            }
+
+
+            function clickButton(item) {
+                if (item == eye) currentCombo += 'eye';
+                else if (item == jum) currentCombo += 'jum';
+                else if (item == mou) currentCombo += 'mou';
+                else if (item == pi) currentCombo += 'pi';
+                else if (item == run) currentCombo += 'run';
+                else if (item == sna) currentCombo += 'sna';
+                else if (item == spi) currentCombo += 'spi';
+                else if (item == squ) currentCombo += 'squ';
+                else if (item == tri) currentCombo += 'tri';
+
+                console.log(currentCombo + " - " + comboToResult[currentCombo]);
+
+                if (count <= 3) {
+                    game.add.tween(item).to({x: nextX, y: 50}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                    selectedSymbols[count] = item;
+                    item.inputEnabled = false;
+                    nextX += 40+300;
+                }
+                count++;
+                if (count == 3) {
+                    if (comboToResult[currentCombo] != undefined) {
+                        comboToResult[currentCombo].imageSprite.alpha = 0;
+                        comboToResult[currentCombo].imageSprite.visible = true;
+                        game.add.tween(comboToResult[currentCombo].imageSprite).to({alpha: 1}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+//                        game.time.events.add(1000, comboToResult[currentCombo].soundSprite.play, this, this);
+                        soundPlaying = true;
+                        comboToResult[currentCombo].soundSprite.play();
+                    } else {
+                        errorSnd.play();
+                        resetButtons();
+                    }
+                }
+            }
+
+            function resetButtons() {
+                disableButtons();
+                // tween back
+                var ty = 1920-350-300;
+                var tx = 50;
+                game.add.tween(eye).to({x: tx, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                game.add.tween(jum).to({x: tx+300+40, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                game.add.tween(mou).to({x: tx + 2*300 + 2*40, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                ty -= 300+40;
+                game.add.tween(pi ).to({x: tx, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                game.add.tween(run).to({x: tx+300+40, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                game.add.tween(sna).to({x: tx + 2*300 + 2*40, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                ty -= 300+40;
+                game.add.tween(spi).to({x: tx, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                game.add.tween(squ).to({x: tx+300+40, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                game.add.tween(tri).to({x: tx + 2*300 + 2*40, y: ty}, 1000, Phaser.Easing.Sinusoidal.InOut, true);
+                // reset Vars
+                nextX = 50;
+                count = 0;
+                currentCombo = '';
+                game.time.events.add(1000, enableButtons, this, this);
+            }
+
+            function enableButtons() {
+                eye.inputEnabled = true;
+                jum.inputEnabled = true;
+                mou.inputEnabled = true;
+                pi.inputEnabled = true;
+                run.inputEnabled = true;
+                sna.inputEnabled = true;
+                spi.inputEnabled = true;
+                squ.inputEnabled = true;
+                tri.inputEnabled = true;
+            }
+
+            function disableButtons() {
+                eye.inputEnabled = false;
+                jum.inputEnabled = false;
+                mou.inputEnabled = false;
+                pi.inputEnabled = false;
+                run.inputEnabled = false;
+                sna.inputEnabled = false;
+                spi.inputEnabled = false;
+                squ.inputEnabled = false;
+                tri.inputEnabled = false;
+            }
+
+
+        </script>
+
+    </body>
+</html>
