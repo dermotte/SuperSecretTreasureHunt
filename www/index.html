@@ -84,16 +84,36 @@
                 game.load.image('button-symbol-tri', 'img/butt-sym-tri.png');
 
                 //empty buttons
-                game.load.image('button-empty', 'img/grey.png');
+                game.load.image('button-empty', 'img/white.png');
                 // bg
                 game.load.image('bg-image', 'img/paper.jpg');
+                game.load.image('bg-goblin', 'img/goblin_large.png');
 
                 // FX
                 game.load.audio('errorSnd', 'snd/error.ogg');
 
                 // load secrets:
-                game.load.image('secret1_img', 'img/secret1.jpg');
-                game.load.audio('secret1_snd', 'snd/secret1.ogg');
+                game.load.image('secret1_img', 'img/secrets/action_01_triff_hut.jpg');
+                game.load.audio('secret1_snd', 'snd/action_01_triff_hut.ogg');
+                game.load.image('secret2_img', 'img/secrets/action_02_wasser_marsch.jpg');
+                game.load.audio('secret2_snd', 'snd/action_02_wasser_marsch.ogg');
+                game.load.image('secret3_img', 'img/secrets/action_03_seiltanz.jpg');
+                game.load.audio('secret3_snd', 'snd/action_03_seiltanz.ogg');
+                game.load.image('secret4_img', 'img/secrets/action_04_clownrennen.jpg');
+                game.load.audio('secret4_snd', 'snd/action_04_clownrennen.ogg');
+                game.load.image('secret5_img', 'img/secrets/action_05_foto.jpg');
+                game.load.audio('secret5_snd', 'snd/action_05_foto.ogg');
+                
+                game.load.image('location1_img', 'img/secrets/location_01_wasserwand.jpg');
+                game.load.audio('location1_snd', 'snd/location_01_wasserwand.ogg');
+                game.load.image('location2_img', 'img/secrets/location_02_briefkasten.jpg');
+                game.load.audio('location2_snd', 'snd/location_02_briefkasten.ogg');
+                game.load.image('location3_img', 'img/secrets/location_03_hasen.jpg');
+                game.load.audio('location3_snd', 'snd/location_03_hasen.ogg');
+                game.load.image('location4_img', 'img/secrets/location_04_trampolin.jpg');
+                game.load.audio('location4_snd', 'snd/location_04_trampolin.ogg');
+                game.load.image('location5_img', 'img/secrets/location_05_ziegelhaufen.jpg');
+                game.load.audio('location5_snd', 'snd/location_05_ziegelhaufen.ogg');
                 game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
                 game.scale.forceOrientation(false, true);
 //                console.log(game.scale.scaleMode);
@@ -111,6 +131,7 @@
             function create() {
                 // setting bg and empty buttons:
                 game.add.image(0, 0, 'bg-image');
+                game.add.image(50, 25, 'bg-goblin');
                 game.add.image(50, 50, 'button-empty');
                 game.add.image(50 + 300 + 40, 50, 'button-empty');
                 game.add.image(50 + 600 + 80, 50, 'button-empty');
@@ -133,7 +154,40 @@
                 comboToResult['squtripi'] = {image: "secret1_img", sound: "secret1_snd"};
                 setSecret(comboToResult['squtripi']);
                 comboToResult['eyespisna'] = {image: "secret2_img", sound: "secret2_snd"};
+                setSecret(comboToResult['eyespisna']);
+                comboToResult['jumsnamou'] = {image: "secret3_img", sound: "secret3_snd"};
+                setSecret(comboToResult['jumsnamou']);
+                comboToResult['trimoueye'] = {image: "secret4_img", sound: "secret4_snd"};
+                setSecret(comboToResult['trimoueye']);
+                comboToResult['snaeyespi'] = {image: "secret5_img", sound: "secret5_snd"};
+                setSecret(comboToResult['snaeyespi']);
+
+                comboToResult['runtrijum'] = {image: "location1_img", sound: "location1_snd"};
+                setSecret(comboToResult['runtrijum']);
+                comboToResult['squrunpi'] = {image: "location2_img", sound: "location2_snd"};
+                setSecret(comboToResult['squrunpi']);
+                comboToResult['spieyepi'] = {image: "location3_img", sound: "location3_snd"};
+                setSecret(comboToResult['spieyepi']);
+                comboToResult['tripisqu'] = {image: "location4_img", sound: "location4_snd"};
+                setSecret(comboToResult['tripisqu']);
+                comboToResult['jumtrieye'] = {image: "location5_img", sound: "location5_snd"};
+                setSecret(comboToResult['jumtrieye']);
                 // ...
+                /*
+                 * jum-sna-mou
+                 * jum-tri-eye
+                 mou-pi-spi
+                 * sna-eye-spi
+                 pi-jum-tri
+                 * run-tri-jum
+                 jum-squ-pi
+                 spi-pi-squ
+                 * spi-eye-pi
+                 squ-spi-sna
+                 * squ-run-pi
+                 * tri-mou-eye
+                 * tri-pi-squ
+                 */
 
 //                game.add.sprite(50, 1920-50-300, 'button-symbol-eye');
 //                eye.width = 300;

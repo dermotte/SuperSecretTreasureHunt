@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="at.juggle.supersecret" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>SuperSecret</name>
+    <name>Koboldsprache</name>
     <description>
         A simple application that allows to show information on entering a code, used to play treasure hunt with kids.
     </description>
@@ -22,6 +22,11 @@
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
+    </platform>
+    <platform name="android">
+        <icon src="res/mipmap-mdpi/ic_launcher.png" density="mdpi" />
+        <icon src="res/mipmap-hdpi/ic_launcher.png" density="hdpi" />
+        <icon src="res/mipmap-xhdpi/ic_launcher.png" density="xhdpi" />
     </platform>
     <preference name="Orientation" value="portrait" />
     <preference name="Fullscreen" value="true" />
